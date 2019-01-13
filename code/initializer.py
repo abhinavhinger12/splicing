@@ -1,4 +1,5 @@
 from random import randint
+
 storage_dict = {
 'seq': [],
 'true_pos': [],
@@ -15,7 +16,6 @@ def inititalizer(seq_arg, true_pos_arg):
     if len(seq_arg) > 100:
         seq_arg = seq_arg[:100]
     storage_dict['seq'].append(seq_arg)
-    print(storage_dict['seq'])
     true_bucket_arg = true_pos_arg // 10 #Integer division simply gives true bucket. No need to take it as another argument
     random_pos = 0
     #Ensuring random never position is never equal to true position
@@ -32,5 +32,41 @@ def inititalizer(seq_arg, true_pos_arg):
         random_bucket = randint(0, total_buckets)
         if random_bucket != true_bucket_arg: break
     storage_dict['rand_bucket'].append(random_bucket)
-    print(storage_dict)
-inititalizer('AAGTTGCCGTACGT', 5)
+#inititalizer('AAGTTGCCGTACGT', 5)
+
+'''from gtfparse import read_gtf
+import pandas as pd
+import gffutils
+
+df  = read_gtf("code/test.gtf")
+df.to_hdf('testgtf.h5',key='df',mode='w')
+df = pd.read_hdf('./testgtf.h5')
+
+print(df)
+'''
+import csv
+seq_list_cleaned = []
+true_pos_cleaned = []
+with open('genomic_data.csv') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    line_count = 0
+    for row in csv_reader:
+        if row[0] != '':
+            #storage_dict["seq"].append(row[0])
+            #storage_dict["true_pos"].append(row[1])
+            seq_list_cleaned.append(row[0])
+            true_pos_cleaned.append(int(row[1]))
+
+print(len(seq_list_cleaned))
+print(len(true_pos_cleaned))
+
+for i in range(len(seq_list_cleaned)):
+    inititalizer(seq_list_cleaned[i], true_pos_cleaned[i])
+ 
+with open('genomic_data_cleaned.csv', 'wb') as csvfile:
+    filewriter = csv.writer(csvfile, delimiter=',',quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    for i in range(len(storage_dict["seq"])):
+            filewriter.writerow([storage_dict['seq'][i], storage_dict['true_pos'][i], storage_dict['rand_pos'][i], storage_dict['true_bucket'][i], storage_dict['rand_bucket'][i]])
+
+
+    
